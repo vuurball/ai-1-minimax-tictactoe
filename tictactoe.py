@@ -4,6 +4,7 @@ Tic Tac Toe Player
 
 import math
 import copy
+import random 
 
 X = "X"
 O = "O"
@@ -38,8 +39,8 @@ def actions(board):
     Returns set of all possible actions (i, j) available on the board.
     """
     possible_moves = set()
-    for i in board:
-        for j in i:
+    for i in range(len(board)):
+        for j in range(len(board)):
             if board[i][j] == EMPTY:
                 possible_moves.add((i, j))
 
@@ -52,7 +53,7 @@ def result(board, action):
     """
     result_board = copy.deepcopy(board)
     
-    if result_board[action[0]][action[1]] == EMPTY:
+    if action is not None and result_board[action[0]][action[1]] == EMPTY:
         next_player = player(board)
         result_board[action[0]][action[1]] = next_player
         return result_board
@@ -64,7 +65,8 @@ def winner(board):
     """
     Returns the winner of the game, if there is one.
     """
-    for indexes in win_indexes(len(board)):
+    win_states = win_indexes(len(board))
+    for indexes in win_states:
         if all(board[r][c] == X for r, c in indexes):
             return X
         if all(board[r][c] == O for r, c in indexes):
@@ -95,14 +97,74 @@ def utility(board):
     if winner_player is None:
         return 0
     
-    return 1 if winner_player == X else -1
+    return player_goal(winner_player)
 
 
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    raise NotImplementedError
+    # no more moves 
+    if terminal(board):
+        return None
+
+    # get the current player
+    cur_player = player(board)
+    possible_actions = actions(board)
+    if cur_player == X:
+        # first move - return rand move
+        if len(possible_actions) == 9:
+            i = random.randrange(len(board) -1)
+            j = random.randrange(len(board) -1)
+            return (i, j)
+
+        # max player 
+        for action in possible_actions:
+            next_board = result(board, action)
+            if min_value(next_board) == 1:
+                return action #optimal move
+        for action in possible_actions:
+            next_board = result(board, action)
+            if min_value(next_board) == 0:
+                return action #neutral move    
+        return action[0] #no good/neutral moves, return the first possible
+    else:
+        # min player 
+        for action in possible_actions:
+            next_board = result(board, action)
+            if max_value(next_board) == -1:
+                return action #optimal move
+        for action in possible_actions:
+            next_board = result(board, action)
+            if max_value(next_board) == 0:
+                return action #neutral move    
+        return action[0] #no good/neutral moves, return the first possible
+            
+
+def min_value(board):
+    # no more moves 
+    if terminal(board):
+        return utility(board)
+
+    best_val = 2
+    possible_actions = actions(board)
+    for action in possible_actions:
+        next_board = result(board, action)
+        best_val = min(best_val, max_value(next_board))
+    return best_val  
+
+def max_value(board):
+    # no more moves 
+    if terminal(board):
+        return utility(board)
+
+    best_val = -2
+    possible_actions = actions(board)
+    for action in possible_actions:
+        next_board = result(board, action)
+        best_val = max(best_val, min_value(next_board))
+    return best_val  
+
 
 
 def win_indexes(n):
@@ -116,3 +178,48 @@ def win_indexes(n):
     yield [(i, i) for i in range(n)]
     # Diagonal top right to bottom left
     yield [(i, n - 1 - i) for i in range(n)]
+
+
+def player_goal(player):
+     return 1 if player == X else -1
+
+# def minimax(board):
+#     """
+#     Returns the optimal action for the current player on the board.
+#     """
+#     # no more moves 
+#     if terminal(board):
+#         return None
+
+#     # get the current player
+#     cur_player = player(board)
+
+#     # get players goal (1 or -1)
+#     goal = player_goal(cur_player)
+
+#     # find best action out of the available ones
+#     possible_actions = actions(board)
+#     neutral_action = set()
+#     non_optimal_action = set()
+
+#     for action in possible_actions:
+#         # get actions result
+#         next_board = result(board, action)
+#         move_result = utility(next_board)
+    
+#         if move_result == 0:
+#             neutral_action.add(action)
+#         else:
+#             if move_result == goal:
+#                 #  good move found
+#                 return action
+#             else:   
+#                 non_optimal_action.add(action)
+
+#     if len(neutral_action) > 0:
+#         # return first neutral move
+#         return neutral_action.pop()
+#     else:
+#         # no good/neutral moves, return what's left
+#         return non_optimal_action.pop()
+             
