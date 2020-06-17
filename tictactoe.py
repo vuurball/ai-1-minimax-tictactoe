@@ -110,6 +110,11 @@ def minimax(board):
 
     # get the current player
     cur_player = player(board)
+    # best found option for max player
+    alpha = -2 
+    # best found option for min player
+    beta = 2
+
     possible_actions = actions(board)
     if cur_player == X:
         # first move - return rand move
@@ -119,16 +124,16 @@ def minimax(board):
             return (i, j)
 
         # max player 
-        (b, best_move) = max_value(board)
+        (b, best_move) = max_value(board, alpha, beta)
     else:
         # min player 
-        (b, best_move) = min_value(board)
+        (b, best_move) = min_value(board, alpha, beta)
     return best_move 
             
 
-def min_value(board):
+def min_value(board, alpha, beta):
 
-    best_move = set()
+    best_move = None
 
     # no more moves 
     if terminal(board):
@@ -139,16 +144,24 @@ def min_value(board):
     possible_actions = actions(board)
     for action in possible_actions:
         next_board = result(board, action)
-        (res_val, res_move) = max_value(next_board)
-        if(best_min_val > res_val):
+        (res_val, res_move) = max_value(next_board, alpha, beta)
+        if best_min_val > res_val:
             best_min_val = res_val
             best_move = action
+
+        #the alpha beta prunning part:
+        if best_min_val <= alpha:
+            return (best_min_val, best_move)
+
+        if best_min_val < beta:
+            beta = best_min_val
+
     return (best_min_val, best_move)  
 
 
-def max_value(board):
+def max_value(board, alpha, beta):
 
-    best_move = set()
+    best_move = None
 
     # no more moves 
     if terminal(board):
@@ -159,10 +172,18 @@ def max_value(board):
     possible_actions = actions(board)
     for action in possible_actions:
         next_board = result(board, action)
-        (res_val, res_move) = min_value(next_board)
-        if(best_max_val < res_val):
+        (res_val, res_move) = min_value(next_board, alpha, beta)
+        if best_max_val < res_val:
             best_max_val = res_val
             best_move = action
+
+        #the alpha beta prunning part:
+        if best_max_val >= beta:
+            return (best_max_val, best_move)
+
+        if best_max_val > alpha:
+            alpha = best_max_val
+
     return (best_max_val, best_move)  
 
 
