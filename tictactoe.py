@@ -119,51 +119,51 @@ def minimax(board):
             return (i, j)
 
         # max player 
-        for action in possible_actions:
-            next_board = result(board, action)
-            if min_value(next_board) == 1:
-                return action #optimal move
-        for action in possible_actions:
-            next_board = result(board, action)
-            if min_value(next_board) == 0:
-                return action #neutral move    
-        return action[0] #no good/neutral moves, return the first possible
+        (b, best_move) = max_value(board)
     else:
         # min player 
-        for action in possible_actions:
-            next_board = result(board, action)
-            if max_value(next_board) == -1:
-                return action #optimal move
-        for action in possible_actions:
-            next_board = result(board, action)
-            if max_value(next_board) == 0:
-                return action #neutral move    
-        return action[0] #no good/neutral moves, return the first possible
+        (b, best_move) = min_value(board)
+    return best_move 
             
 
 def min_value(board):
+
+    best_move = set()
+
     # no more moves 
     if terminal(board):
-        return utility(board)
+        return (utility(board), best_move)
 
-    best_val = 2
+    best_min_val = 2
+
     possible_actions = actions(board)
     for action in possible_actions:
         next_board = result(board, action)
-        best_val = min(best_val, max_value(next_board))
-    return best_val  
+        (res_val, res_move) = max_value(next_board)
+        if(best_min_val > res_val):
+            best_min_val = res_val
+            best_move = action
+    return (best_min_val, best_move)  
+
 
 def max_value(board):
+
+    best_move = set()
+
     # no more moves 
     if terminal(board):
-        return utility(board)
+        return (utility(board), best_move)
 
-    best_val = -2
+    best_max_val = -2
+
     possible_actions = actions(board)
     for action in possible_actions:
         next_board = result(board, action)
-        best_val = max(best_val, min_value(next_board))
-    return best_val  
+        (res_val, res_move) = min_value(next_board)
+        if(best_max_val < res_val):
+            best_max_val = res_val
+            best_move = action
+    return (best_max_val, best_move)  
 
 
 
@@ -182,44 +182,3 @@ def win_indexes(n):
 
 def player_goal(player):
      return 1 if player == X else -1
-
-# def minimax(board):
-#     """
-#     Returns the optimal action for the current player on the board.
-#     """
-#     # no more moves 
-#     if terminal(board):
-#         return None
-
-#     # get the current player
-#     cur_player = player(board)
-
-#     # get players goal (1 or -1)
-#     goal = player_goal(cur_player)
-
-#     # find best action out of the available ones
-#     possible_actions = actions(board)
-#     neutral_action = set()
-#     non_optimal_action = set()
-
-#     for action in possible_actions:
-#         # get actions result
-#         next_board = result(board, action)
-#         move_result = utility(next_board)
-    
-#         if move_result == 0:
-#             neutral_action.add(action)
-#         else:
-#             if move_result == goal:
-#                 #  good move found
-#                 return action
-#             else:   
-#                 non_optimal_action.add(action)
-
-#     if len(neutral_action) > 0:
-#         # return first neutral move
-#         return neutral_action.pop()
-#     else:
-#         # no good/neutral moves, return what's left
-#         return non_optimal_action.pop()
-             

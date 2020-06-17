@@ -8,8 +8,10 @@ pygame.init()
 size = width, height = 600, 400
 
 # Colors
-black = (0, 0, 0)
-white = (255, 255, 255)
+black = (40, 44, 52)
+white = (142, 142, 142)
+orange = (255, 202, 9)
+blue = (52, 194, 226)
 
 screen = pygame.display.set_mode(size)
 
@@ -33,7 +35,7 @@ while True:
     if user is None:
 
         # Draw title
-        title = largeFont.render("Play Tic-Tac-Toe", True, white)
+        title = largeFont.render("Play Tic-Tac-Toe", True, orange)
         titleRect = title.get_rect()
         titleRect.center = ((width / 2), 50)
         screen.blit(title, titleRect)
@@ -82,7 +84,8 @@ while True:
                 pygame.draw.rect(screen, white, rect, 3)
 
                 if board[i][j] != ttt.EMPTY:
-                    move = moveFont.render(board[i][j], True, white)
+                    move_color = blue if board[i][j] == 'X' else orange  
+                    move = moveFont.render(board[i][j], True, move_color)
                     moveRect = move.get_rect()
                     moveRect.center = rect.center
                     screen.blit(move, moveRect)
