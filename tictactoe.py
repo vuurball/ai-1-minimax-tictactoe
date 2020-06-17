@@ -110,18 +110,16 @@ def minimax(board):
 
     # get the current player
     cur_player = player(board)
-    # best found option for max player
+    # best found option for max player (init opposite val)
     alpha = -2 
-    # best found option for min player
+    # best found option for min player (init opposite val)
     beta = 2
 
     possible_actions = actions(board)
     if cur_player == X:
         # first move - return rand move
         if len(possible_actions) == 9:
-            i = random.randrange(len(board) -1)
-            j = random.randrange(len(board) -1)
-            return (i, j)
+            return get_random_move(len(board) -1)
 
         # max player 
         (b, best_move) = max_value(board, alpha, beta)
@@ -203,3 +201,8 @@ def win_indexes(n):
 
 def player_goal(player):
      return 1 if player == X else -1
+
+def get_random_move(max):
+    i = random.randrange(max)
+    j = random.randrange(max)
+    return (i, j)
